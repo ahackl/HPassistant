@@ -1,0 +1,100 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Settings
+    </ion-title>
+    <ion-buttons slot="primary">
+      <ion-button (click)="onSumbit()" [disabled]="!form.valid">
+        <ion-icon name="checkmark" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Settings</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <form [formGroup]="form">
+    <ion-grid>
+      <ion-row>
+        <ion-col sizeSm="6" offsetSm="3">
+          <ion-list>
+            <ion-item-group>
+              <ion-item-divider>
+                <ion-label>Connection</ion-label>
+              </ion-item-divider>
+              <ion-item>
+                <ion-label position="floating">Server Name/IP-Number extern</ion-label>
+                <ion-input type="text" formControlName="server_name_extern"></ion-input>
+              </ion-item>
+              <ion-item>
+                <ion-label position="floating">Server Name/IP-Number intern</ion-label>
+                <ion-input type="text" formControlName="server_name_intern"></ion-input>
+              </ion-item>
+              <ion-item>
+                <ion-select label="Connection" formControlName="connection" label-placement="floating">
+                  <ion-select-option value="intern">intern</ion-select-option>
+                  <ion-select-option value="extern">extern</ion-select-option>
+                  <ion-select-option value="auto">auto</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-item-group>
+            <ion-item-group>
+              <ion-item-divider>
+                <ion-label>Login details</ion-label>
+              </ion-item-divider>
+              <ion-item>
+                <ion-label position="floating">Username</ion-label>
+                <ion-input type="text"  formControlName="username"></ion-input>
+              </ion-item>
+              <ion-item>
+                <ion-label position="floating">Password</ion-label>
+                <ion-input type="password"  formControlName="password"></ion-input>
+                (The password is stored unencrypted)
+              </ion-item>
+              <ion-item>
+                <ion-select label="Authentication"   formControlName="authentication" label-placement="floating">
+                  <ion-select-option value="Basic">Basic</ion-select-option>
+                  <ion-select-option value="Digest">Digest</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-item-group>
+            <ion-item-group>
+              <ion-item-divider>
+                <ion-label>Preference</ion-label>
+              </ion-item-divider>
+              <ion-item>
+                <ion-label position="floating">Delay time for queue in seconds</ion-label>
+                <ion-input type="text" formControlName="queue_dealy"></ion-input>
+              </ion-item>
+            </ion-item-group>
+          </ion-list>
+          <ion-button expand="block" (click)="purge()">
+            Purge all deleted measurements
+          </ion-button>
+         
+        </ion-col>
+      </ion-row>
+
+    </ion-grid>
+  </form>
+
+  <ion-toast
+  [isOpen]="isToastOpen1"
+  message="All measurements which are marked as deleted are removed."
+  [duration]="3000"
+  (didDismiss)="setOpen1(false)"
+  ></ion-toast>
+
+  <ion-toast
+  [isOpen]="isToastOpen2"
+  message="Settings saved"
+  [duration]="3000"
+  (didDismiss)="setOpen2(false)"
+  ></ion-toast>
+
+</ion-content>
