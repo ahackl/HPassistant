@@ -155,11 +155,11 @@ export class SettingsService {
     await this.readSettings();
     try {
       const queue_dealy = parseInt(this.settingsData.queue_dealy, 10);
-      if (Number.isNaN(queue_dealy)) {return(1);};
-      if (queue_dealy <= 0) {return(1);};
-      return queue_dealy;
+      if (Number.isNaN(queue_dealy)) {return(0.1);};
+      if (queue_dealy <= 0) {return(0.1);};
+      return queue_dealy / 10.0;
     } catch (error) {
-      return(1);
+      return(0.1);
     }
   }
 
