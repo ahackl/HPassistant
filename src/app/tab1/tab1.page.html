@@ -43,10 +43,25 @@
               </ion-item-options>
               <ion-item >
                 <ion-reorder slot="end"></ion-reorder>
-                <ion-label>
-                  <h3>{{sensor.name}}</h3>
-                  <p>{{sensor.value}} {{sensor.unit}} &#64; {{sensor.timestamp}}</p>
-                </ion-label>
+                <ion-grid class="ion-align-items-center">
+                  <ion-row>
+                    <ion-col>
+
+                      <ion-grid class="ion-align-items-center">
+                        <ion-row>
+                          <ion-col>{{sensor.name}} [{{sensor.unit}}]</ion-col>
+                        </ion-row>
+                        <ion-row>
+                          <ion-col class="small">{{sensor.timestamp}}</ion-col>
+                        </ion-row>
+                      </ion-grid>
+
+
+
+                    </ion-col>
+                    <ion-col size="auto" class="larger">{{sensor.value}}</ion-col>
+                  </ion-row>
+                </ion-grid>
               </ion-item>
               <ion-item-options side="end" (click)="edit(i,slidingItem)">
                 <ion-item-option>edit</ion-item-option>
@@ -57,7 +72,7 @@
         </ion-col>
     </ion-row>
   </ion-grid>
- 
+
   <ion-modal [isOpen]="isNewSensor">
     <ng-template>
       <ion-header>
