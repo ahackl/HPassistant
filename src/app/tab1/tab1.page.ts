@@ -2,7 +2,7 @@ import { Component, NgModule, OnDestroy, OnInit } from '@angular/core';
 import { IonCardContent, IonCardTitle,IonCardHeader, IonHeader, IonButton, IonIcon, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonItem, IonLabel, IonInput, IonButtons, IonModal, IonItemSliding, IonList, IonItemOption, IonItemOptions, IonReorderGroup, IonReorder, IonBadge, IonRefresher, IonRefresherContent, IonCard, IonCardSubtitle } from '@ionic/angular/standalone';
 import { ExploreContainerComponent } from '../explore-container/explore-container.component';
 import { FormControl, FormGroup, NgModel, ReactiveFormsModule, Validators,FormsModule } from '@angular/forms';
-import { checkmark, settings, addOutline, trashOutline, createOutline } from 'ionicons/icons';
+import { checkmark, settings, addOutline, trashOutline, createOutline, ellipsisVerticalOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Preferences } from '@capacitor/preferences';
 import { SettingsService, SensorDeviceData} from '../services/settings.service';
@@ -66,6 +66,9 @@ export class Tab1Page implements OnInit, OnDestroy{
   isNewSensor: boolean = false;
   isDeleteSensor: boolean = false;
   isCleanSensor: boolean = false;
+
+
+  sort_button_visible: boolean = false;
   
   edit_name: string = "";
   edit_unit: string = "";
@@ -86,6 +89,10 @@ export class Tab1Page implements OnInit, OnDestroy{
       this.queue.addToQueue(sensor);   
     }
     event.target.complete();
+  }
+
+  toggle_sort_button() {
+    this.sort_button_visible = !this.sort_button_visible;
   }
 
   handleReorder(ev: CustomEvent<ItemReorderEventDetail>):void
@@ -111,7 +118,7 @@ export class Tab1Page implements OnInit, OnDestroy{
   constructor(private settings: SettingsService,
               private queue: QueueService,
               private rxdb: RxDBService) { 
-    addIcons({addOutline,trashOutline,createOutline,checkmark});
+    addIcons({addOutline,ellipsisVerticalOutline,trashOutline,createOutline,checkmark});
   }
 
   toSensorData(sensor: SensorDeviceData): SensorData {
