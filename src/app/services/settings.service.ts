@@ -18,6 +18,7 @@ export interface SettingsData {
   password: string;
   authentication: string;
   queue_dealy: string;
+  reload_startup: string;
   [key: string]: string;
 }
 
@@ -120,7 +121,8 @@ export class SettingsService {
                        'username':'',
                        'password':'',
                        'authentication':'',
-                       'queue_dealy':''
+                       'queue_dealy':'',
+                       'reload_startup':''
                        } as SettingsData;
     return initData;
   }

@@ -71,6 +71,13 @@
                 <ion-label position="floating">Delay time for queue in 1/10 seconds</ion-label>
                 <ion-input type="text" formControlName="queue_dealy"></ion-input>
               </ion-item>
+              <ion-item>
+                <ion-select label="Reload at startup"  formControlName="reload_startup" label-placement="floating">
+                  <ion-select-option value="automatic">automatic</ion-select-option>
+                  <ion-select-option value="manual">manual</ion-select-option>
+                </ion-select>
+              </ion-item>
+
             </ion-item-group>
           </ion-list>
           <ion-button expand="block" (click)="purge()">

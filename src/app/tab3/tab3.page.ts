@@ -102,6 +102,10 @@ export class Tab3Page implements OnInit  {
       queue_dealy: new FormControl(null, {
         updateOn: 'blur',
         validators: [Validators.required]
+      }),
+      reload_startup: new FormControl(null, {
+        updateOn: 'blur',
+        validators: [Validators.required]
       })
     });
     this.formData = await this.settings.getAll();

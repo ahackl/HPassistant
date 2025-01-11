@@ -19,13 +19,23 @@ export class QueueService {
   private dataSubject: BehaviorSubject<any>;
   public length: Observable<number>;
 
+
+  private connectionSubject: BehaviorSubject<any>;
+  public connection:  Observable<string>;
+
   constructor(private settings: SettingsService,
               private rxdb: RxDBService,
               private http:HttpService) {
-    this.dataSubject = new BehaviorSubject<any>(null);
-    this.length = this.dataSubject.asObservable();
-    this.dataSubject.next(0);
-    this.processQueue();
+    
+                this.dataSubject = new BehaviorSubject<any>(null);
+                this.length = this.dataSubject.asObservable();
+                this.dataSubject.next(0);
+
+                this.connectionSubject = new BehaviorSubject<any>(null);
+                this.connection = this.connectionSubject.asObservable();
+                this.connectionSubject.next("");
+
+                this.processQueue();
   }
 
   private async checkNewSettings(): Promise<void>  {
@@ -63,10 +73,12 @@ export class QueueService {
   private async getHostName(): Promise<string> 
   {
     if (this.settings.get('connection') === "intern") {
+      this.connectionSubject.next("intern");
       return this.settings.get('server_name_intern');
     }
 
     if (this.settings.get('connection') === "extern") {
+      this.connectionSubject.next("extern");
       return this.settings.get('server_name_extern');
     }
 
@@ -74,8 +86,10 @@ export class QueueService {
       await this.http.checkServer(this.settings.get('server_name_intern'));
     }
     catch {
+      this.connectionSubject.next("extern");
       return this.settings.get('server_name_extern');
     }
+    this.connectionSubject.next("intern");
     return this.settings.get('server_name_intern');
   }
 

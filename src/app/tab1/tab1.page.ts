@@ -2,7 +2,7 @@ import { Component, NgModule, OnDestroy, OnInit } from '@angular/core';
 import { IonCardContent, IonCardTitle,IonCardHeader, IonHeader, IonButton, IonIcon, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonItem, IonLabel, IonInput, IonButtons, IonModal, IonItemSliding, IonList, IonItemOption, IonItemOptions, IonReorderGroup, IonReorder, IonBadge, IonRefresher, IonRefresherContent, IonCard, IonCardSubtitle } from '@ionic/angular/standalone';
 import { ExploreContainerComponent } from '../explore-container/explore-container.component';
 import { FormControl, FormGroup, NgModel, ReactiveFormsModule, Validators,FormsModule } from '@angular/forms';
-import { checkmark, settings, addOutline, trashOutline, createOutline, ellipsisVerticalOutline } from 'ionicons/icons';
+import { checkmark, settings, addOutline, trashOutline, createOutline, ellipsisVerticalOutline, logOutOutline, logInOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Preferences } from '@capacitor/preferences';
 import { SettingsService, SensorDeviceData} from '../services/settings.service';
@@ -59,6 +59,8 @@ interface SensorData extends SensorDeviceData {
 export class Tab1Page implements OnInit, OnDestroy{
   
   private subscription_queue_length: Subscription | null = null;
+  private subscription_queue_connection: Subscription | null = null;
+
   private subscription_rxdb_count: Subscription | null = null;
   private subscription_last_db_update: Subscription | null = null;
 
@@ -77,6 +79,7 @@ export class Tab1Page implements OnInit, OnDestroy{
   edit_index: number = 0;
 
   queue_lengths = 0;
+  queue_connection = "";
   rxdb_count = 0;
   sensor_data_count = 0;
 
@@ -84,10 +87,27 @@ export class Tab1Page implements OnInit, OnDestroy{
 
   rxdbMapToindex: Map<number, number> = new Map();
 
-  handleRefresh(event:any) {
+
+  private update_queue():void {
     for (const sensor of this.sensorList) {
+      console.log(sensor);
       this.queue.addToQueue(sensor);   
     }
+  }
+
+  delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async  delayedExecutionAsync(): Promise<void> {
+    await this.delay(1000);
+    if ( this.settings.get('reload_startup') === 'automatic') {
+      this.update_queue();
+    }
+  }
+
+  handleRefresh(event:any) {
+    this.update_queue();
     event.target.complete();
   }
 
@@ -118,7 +138,7 @@ export class Tab1Page implements OnInit, OnDestroy{
   constructor(private settings: SettingsService,
               private queue: QueueService,
               private rxdb: RxDBService) { 
-    addIcons({addOutline,ellipsisVerticalOutline,trashOutline,createOutline,checkmark});
+    addIcons({logOutOutline,logInOutline,addOutline,ellipsisVerticalOutline,trashOutline,createOutline,checkmark});
   }
 
   toSensorData(sensor: SensorDeviceData): SensorData {
@@ -169,6 +189,10 @@ export class Tab1Page implements OnInit, OnDestroy{
       data => {this.queue_lengths = data;}
     );
 
+    this.subscription_queue_connection = this.queue.connection.subscribe(
+      data => {this.queue_connection = data}
+    )
+
     this.subscription_rxdb_count = this.rxdb.count.subscribe(
       data => {this.rxdb_count = data;}
     );
@@ -191,6 +215,12 @@ export class Tab1Page implements OnInit, OnDestroy{
       }
     )
 
+    this.delayedExecutionAsync();   
+    
+  }
+
+  ionViewDidEnter(){
+
   }
 
   ngOnDestroy() {
@@ -203,6 +233,11 @@ export class Tab1Page implements OnInit, OnDestroy{
     if (this.subscription_last_db_update) {
       this.subscription_last_db_update.unsubscribe();
     }
+    if (this.subscription_queue_connection){
+      this.subscription_queue_connection.unsubscribe();
+    }
+
+
   }
 
   setDefault(): void {

@@ -4,6 +4,8 @@
       Sensors
       <ion-badge >{{rxdb_count}}</ion-badge>
       <ion-badge color="warning">{{queue_lengths}}</ion-badge>
+      <ion-icon name="log-out-outline" *ngIf="queue_connection === 'extern'" ></ion-icon>
+      <ion-icon name="log-in-outline" *ngIf="queue_connection === 'intern'"></ion-icon>
     </ion-title>
     <ion-buttons slot="primary">
       <ion-button (click)="new()">
@@ -52,12 +54,11 @@
 
                   <ion-row>
                     <ion-col class="larger">{{sensor.name}}</ion-col>
-                    <ion-col size="auto" class="larger">{{sensor.value}}</ion-col>
+                    <ion-col size="auto" class="larger">{{sensor.value}} {{sensor.unit}}</ion-col>
                   </ion-row>
 
                   <ion-row>
                     <ion-col class="small">{{sensor.timestamp}}</ion-col>
-                    <ion-col class="small" style="text-align: right;">{{sensor.unit}}</ion-col>
                   </ion-row>
 
                 </ion-grid>
