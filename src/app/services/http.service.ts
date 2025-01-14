@@ -252,7 +252,8 @@ export class HttpService {
 
   public async checkServer(hostname:string) {
     const method = 'GET'
-    const url = 'http://'+ hostname;
+    const uri = "/ws"
+    const url = 'http://'+ hostname + uri;
 
     const options : HttpOptions = {
       method: method,
@@ -261,6 +262,7 @@ export class HttpService {
 
     return await CapacitorHttp.request(options);
   }
+
 
   /**
    * Read the value und the unit of oid from a server with basic auth

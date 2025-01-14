@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Network } from '@capacitor/network';
 import { interval, Subscription } from 'rxjs';
 import { BehaviorSubject, Observable } from 'rxjs';
-import {SettingsService} from './settings.service';
-import {RxDBService} from './rx-db.service';
+import { SettingsService } from './settings.service';
+import { RxDBService } from './rx-db.service';
 import { HttpService } from './http.service';
 
 @Injectable({
@@ -25,7 +25,7 @@ export class QueueService {
 
   constructor(private settings: SettingsService,
               private rxdb: RxDBService,
-              private http:HttpService) {
+              private http: HttpService) {
     
                 this.dataSubject = new BehaviorSubject<any>(null);
                 this.length = this.dataSubject.asObservable();
@@ -82,8 +82,20 @@ export class QueueService {
       return this.settings.get('server_name_extern');
     }
 
-    try{
-      await this.http.checkServer(this.settings.get('server_name_intern'));
+    // this.settings.get('connection') === "auto"
+    // ------------------------------------------
+    const status = await Network.getStatus();
+    if (status.connectionType == 'cellular') {
+      this.connectionSubject.next("extern");
+      return this.settings.get('server_name_extern');
+    }
+
+    try {
+      const result = await this.http.checkServer(this.settings.get('server_name_intern'));
+      if (result.status != 401) {
+        this.connectionSubject.next("extern");
+        return this.settings.get('server_name_extern');
+      }
     }
     catch {
       this.connectionSubject.next("extern");
