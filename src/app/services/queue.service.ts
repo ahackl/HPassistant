@@ -19,9 +19,11 @@ export class QueueService {
   private dataSubject: BehaviorSubject<any>;
   public length: Observable<number>;
 
-
   private connectionSubject: BehaviorSubject<any>;
   public connection:  Observable<string>;
+
+  private indexSubject: BehaviorSubject<any>;
+  public index: Observable<number>;
 
   constructor(private settings: SettingsService,
               private rxdb: RxDBService,
@@ -34,6 +36,10 @@ export class QueueService {
                 this.connectionSubject = new BehaviorSubject<any>(null);
                 this.connection = this.connectionSubject.asObservable();
                 this.connectionSubject.next("");
+
+                this.indexSubject = new BehaviorSubject<any>(null);
+                this.index = this.indexSubject.asObservable();
+                this.indexSubject.next(-1);
 
                 this.processQueue();
   }
@@ -51,9 +57,10 @@ export class QueueService {
     }
   }
 
-  public async addToQueue(request: any): Promise<void> {
+  public async addToQueue(request:any, index:number): Promise<void> {
     await this.checkNewSettings();
-    this.queue.push(request);
+    this.queue.push([request, index]);
+    this.dataSubject.next(this.queue.length);
   }
 
   public clearQueue(){
@@ -64,8 +71,12 @@ export class QueueService {
   {
     this.queue_dealy = await this.settings.getQueueDealyInSec();
     this.subscription = interval(this.queue_dealy*1000).subscribe(() => {
+
       if (this.queue.length > 0) {
         this.sendRequests();
+      }
+      else {
+        this.indexSubject.next(-1);
       }
    });
   }
@@ -109,23 +120,23 @@ export class QueueService {
 
   private async sendRequests(): Promise<void>
   {
-    if (this.queue.length == 0) {return;};
+    if (this.queue.length == 0) {
+      this.indexSubject.next(-1);
+      return;
+    };
     const request = this.queue.shift();
     this.dataSubject.next(this.queue.length);
+    this.indexSubject.next(request[1]);
 
-    const oid = request['soap_id'];
+    const oid = request[0]['soap_id'];
     const hostname = await this.getHostName();
     const username = this.settings.get('username');
     const password = this.settings.get('password');
     const authentication = this.settings.get('authentication');
-
     const data = await this.http.getData(hostname, oid,
                                    username, password, 
                                    authentication);
-
-    await this.rxdb.addMeasurement(request.rx_id, data.value);
-    
-    this.dataSubject.next(this.queue.length);
+    await this.rxdb.addMeasurement(request[0]['rx_id'], data.value);
   }
 
 }

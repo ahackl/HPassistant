@@ -60,6 +60,7 @@ export class Tab1Page implements OnInit, OnDestroy{
   
   private subscription_queue_length: Subscription | null = null;
   private subscription_queue_connection: Subscription | null = null;
+  private subscription_queue_index: Subscription | null = null;
 
   private subscription_rxdb_count: Subscription | null = null;
   private subscription_last_db_update: Subscription | null = null;
@@ -79,6 +80,7 @@ export class Tab1Page implements OnInit, OnDestroy{
   edit_index: number = 0;
 
   queue_lengths = 0;
+  queue_index = -1;
   queue_connection = "";
   rxdb_count = 0;
   sensor_data_count = 0;
@@ -89,17 +91,16 @@ export class Tab1Page implements OnInit, OnDestroy{
 
 
   private update_queue():void {
-    for (const sensor of this.sensorList) {
-      console.log(sensor);
-      this.queue.addToQueue(sensor);   
-    }
+    this.sensorList.forEach((sensor, index) => {
+      this.queue.addToQueue(sensor, index);   
+    });
   }
 
   delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  async  delayedExecutionAsync(): Promise<void> {
+  async delayedExecutionAsync(): Promise<void> {
     await this.delay(1000);
     if ( this.settings.get('reload_startup') === 'automatic') {
       this.update_queue();
@@ -189,6 +190,10 @@ export class Tab1Page implements OnInit, OnDestroy{
       data => {this.queue_lengths = data;}
     );
 
+    this.subscription_queue_index = this.queue.index.subscribe(
+      data => {this.queue_index = data;}
+    );
+
     this.subscription_queue_connection = this.queue.connection.subscribe(
       data => {this.queue_connection = data}
     )
@@ -226,6 +231,9 @@ export class Tab1Page implements OnInit, OnDestroy{
   ngOnDestroy() {
     if (this.subscription_queue_length) {
       this.subscription_queue_length.unsubscribe();
+    }
+    if (this.subscription_queue_index) {
+      this.subscription_queue_index.unsubscribe();
     }
     if (this.subscription_rxdb_count) {
       this.subscription_rxdb_count.unsubscribe();
